@@ -1,3 +1,15 @@
+#####################################
+#####################################
+# Ruben Izquierdo Bevia
+# VU University of Amsterdam
+# ruben.izquierdobevia@vu.nl
+# rubensanvi@gmail.com
+# http://rubenizquierdobevia.com/
+# Version 1.0
+#####################################
+#####################################
+
+
 SS = {}
 SS['00'] = 'adj.all'
 SS['01'] = 'adj.pert'

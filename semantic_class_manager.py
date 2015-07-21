@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+#####################################
+#####################################
+# Ruben Izquierdo Bevia
+# VU University of Amsterdam
+# ruben.izquierdobevia@vu.nl
+# rubensanvi@gmail.com
+# http://rubenizquierdobevia.com/
+# Version 1.0
+#####################################
+#####################################
+
+
 import os
 import sys
 from subprocess import check_output

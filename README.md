@@ -1,0 +1,1 @@
+#Semantic class manager#
