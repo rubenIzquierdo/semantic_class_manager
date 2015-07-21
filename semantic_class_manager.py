@@ -35,14 +35,14 @@ class SemanticClassManager(object):
     def normalise_pos(self,this_pos):
         pos = None
         if this_pos.lower() in ['noun','n','1']:
-            this_pos = self.NOUN
+            pos = self.NOUN
         elif this_pos.lower() in ['verb','v','2']:
-            this_pos = self.VERB
+            pos = self.VERB
         elif this_pos.lower() in ['adj','j','3','5','s','a']:
-            this_pos = self.ADJ
+            pos = self.ADJ
         elif this_pos.lower() in ['adv','r','4']:
-            this_pos = self.ADV
-        return this_pos
+            pos = self.ADV
+        return pos
     
     def get_classes_for_synset_pos(self,synset,this_pos, this_wn_version=None):
         if this_wn_version is None:
