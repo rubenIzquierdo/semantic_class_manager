@@ -206,8 +206,9 @@ class BLC(SemanticClassManager):
         else:
             p1 = class1.rfind('#')
             pos_c1 = class1[p1-1]
+            
             p2 = class2.rfind('#')
-            pos_c2 = class1[p2-1]
+            pos_c2 = class2[p2-1]
             if pos_c1 == pos_c2:
                 compatible = True
             else:
