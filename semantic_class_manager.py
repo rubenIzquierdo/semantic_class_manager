@@ -99,6 +99,9 @@ class SemanticClassManager(object):
         return list(set(classes))
             
             
+    def are_compatible(self,class1,class2):
+        pass
+            
         
     
                 
@@ -196,6 +199,21 @@ class BLC(SemanticClassManager):
         return friendly_blc_to_ili
             
             
+    def are_compatible(self,class1,class2):
+        compatible = False
+        if class1 == class2:
+            compatible = False
+        else:
+            p1 = class1.rfind('#')
+            pos_c1 = class1[p1-1]
+            p2 = class2.rfind('#')
+            pos_c2 = class1[p2-1]
+            if pos_c1 == pos_c2:
+                compatible = True
+            else:
+                compatible = False
+        return compatible
+            
             
 ##########################################################################################
 ##########################################################################################
@@ -252,6 +270,13 @@ class WND(SemanticClassManager):
 
         fd.close()
         
+    
+    def are_compatible(self,class1,class2):
+        if class1 == class2:
+            return False
+        else:
+            return True
+        
 
                 
 ##########################################################################################
@@ -292,3 +317,16 @@ class SuperSense(SemanticClassManager):
             self.map_synset_pos_to_class[pos][synset] = [SUPERSENSE_LIST[int_supersense]] 
 
         fd.close()
+        
+    def are_compatible(self,class1,class2):
+        if class1 == class2:
+            return False
+        else:
+            p1 = class1.find('.')
+            pos1 = class1[:p1]
+            p2 = class2.find('.')
+            pos2 = class2[:p2]
+            if pos1 == pos2:
+                return True
+            else:
+                return False
