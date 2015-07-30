@@ -31,6 +31,7 @@ class SemanticClassManager(object):
         self.wn_mapper = None   #By default we will not use it
         self.synset_for_lexkey = None   # To be read by the subclasses    {lexkey} --> offset
         self.synsets_for_lemma_pos = None # To be read by subclasses    {(lemma,pos)} -> [s1,s2,s3,s4]
+        self.this_type = 'SemanticClassAbstract'
         
     def normalise_pos(self,this_pos):
         pos = None
@@ -101,6 +102,9 @@ class SemanticClassManager(object):
             
     def are_compatible(self,class1,class2):
         pass
+        
+    def get_type(self):
+        return self.this_type
             
         
     
@@ -136,7 +140,7 @@ class BLC(SemanticClassManager):
             raise Exception('Type relation not valid')
                                        
         self.load_blc(min_freq, type_relations)   
-        
+        self.this_type = 'BLC_minFreq#%d_relations#%s_wnversion#%s' % (min_freq, type_relations, self.wn_version)
         
           
              
@@ -231,6 +235,7 @@ class WND(SemanticClassManager):
         self.wn_version = '20'
         self.__load_wnd__()
         self.__load_synset_for_lexkey__()
+        self.this_type = 'WND_wnversion#%s' % self.wn_version
         
     def __load_wnd__(self):
         #Creates
@@ -293,6 +298,7 @@ class SuperSense(SemanticClassManager):
         super(SuperSense, self).__init__()
         self.wn_version = '30'
         self.__load_info__()
+        self.this_type = 'SuperSenses_wnversion#%s' % self.wn_version
         
     def __load_info__(self):
         self.synset_for_lexkey = {}
