@@ -96,7 +96,8 @@ class SemanticClassManager(object):
         pos = self.normalise_pos(pos)
         for synset in self.synsets_for_lemma_pos[(lemma,pos)]:
             these_classes = self.get_classes_for_synset_pos(synset, pos)
-            classes.extend(these_classes)
+            if these_classes is not None:
+                classes.extend(these_classes)
         return list(set(classes))
             
             
