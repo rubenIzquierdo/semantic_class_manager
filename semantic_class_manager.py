@@ -20,6 +20,13 @@ from collections import defaultdict
 from python_modules.supersense_list import SS as SUPERSENSE_LIST
 __here__ = os.path.dirname(os.path.realpath(__file__))
 
+class SenseInfo:
+    def __init__(self):
+        self.sense_number = None
+        self.synset = None
+        self.lexkey = None
+        
+
 class SemanticClassManager(object):
     def __init__(self):
         self.map_synset_pos_to_class = {}
@@ -29,8 +36,8 @@ class SemanticClassManager(object):
         self.ADV = 'r'
         self.wn_version = None
         self.wn_mapper = None   #By default we will not use it
-        self.synset_for_lexkey = None   # To be read by the subclasses    {lexkey} --> offset
-        self.synsets_for_lemma_pos = None # To be read by subclasses    {(lemma,pos)} -> [s1,s2,s3,s4]
+        self.synset_for_lexkey = None   # To be read by the subclasses    {lexkey} --> offset        
+        self.sense_info_list_for_lemma_pos = {}
         self.this_type = 'SemanticClassAbstract'
         
     def normalise_pos(self,this_pos):
@@ -45,6 +52,11 @@ class SemanticClassManager(object):
             pos = self.ADV
         return pos
     
+    def sense_info_iterator(self, lemma, pos):
+        for sense_info in self.sense_info_list_for_lemma_pos.get((lemma,pos),[]):
+            yield sense_info
+            
+            
     def get_classes_for_synset_pos(self,synset,this_pos, this_wn_version=None):
         if this_wn_version is None:
             #Then it's assumed to be using the proper wnversion for the selected semantic class (wn30 for BLC and wn21 for WND)
@@ -94,8 +106,8 @@ class SemanticClassManager(object):
     def get_classes_for_lemma_pos(self,lemma,pos):
         classes = []
         pos = self.normalise_pos(pos)
-        for synset in self.synsets_for_lemma_pos[(lemma,pos)]:
-            these_classes = self.get_classes_for_synset_pos(synset, pos)
+        for sense_info in self.sense_info_list_for_lemma_pos[(lemma,pos)]:
+            these_classes = self.get_classes_for_synset_pos(sense_info.synset, pos)
             if these_classes is not None:
                 classes.extend(these_classes)
         return list(set(classes))
@@ -175,16 +187,21 @@ class BLC(SemanticClassManager):
         
         fd = open(path_to_wn_index,'r')
         self.synset_for_lexkey = {}
-        self.synsets_for_lemma_pos = defaultdict(list)
-        
+        self.sense_info_list_for_lemma_pos = defaultdict(list)
+
         for line in fd:
             #.22-caliber%3:01:00:: 03146310 1 0
             lexkey, synset, sense, freq = line.strip().split()
+            sense_info = SenseInfo()
+            sense_info.sense_number = sense
+            sense_info.lexkey = lexkey
+            sense_info.synset = synset
+            
             self.synset_for_lexkey[lexkey] = synset
             p = lexkey.find('%')
             lemma = lexkey[:p]
             int_pos = lexkey[p+1]
-            self.synsets_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(synset)
+            self.sense_info_list_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(sense_info)
             
             pos = None
             if int_pos == '1':
@@ -262,18 +279,23 @@ class WND(SemanticClassManager):
         
     def __load_synset_for_lexkey__(self):
         self.synset_for_lexkey = {}
-        self.synsets_for_lemma_pos = defaultdict(list)
         wn_index_file = __here__+'/resources/WordNet-2.0/dict/index.sense'
+        self.sense_info_list_for_lemma_pos = defaultdict(list)
         fd = open(wn_index_file,'r')
         for line in fd:
             #.22-caliber%3:01:00:: 03146310 1 0
             lexkey, synset, sense, freq = line.strip().split()
+            sense_info = SenseInfo()
+            sense_info.sense_number = sense
+            sense_info.lexkey = lexkey
+            sense_info.synset = synset
+            
             self.synset_for_lexkey[lexkey] = synset
 
             p = lexkey.find('%')
             lemma = lexkey[:p]
             int_pos = lexkey[p+1]
-            self.synsets_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(synset)  
+            self.sense_info_list_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(sense_info)
 
         fd.close()
         
@@ -303,18 +325,24 @@ class SuperSense(SemanticClassManager):
         
     def __load_info__(self):
         self.synset_for_lexkey = {}
-        self.synsets_for_lemma_pos = defaultdict(list)
+        self.sense_info_list_for_lemma_pos = defaultdict(list)
+
         wn_index_file = __here__+'/resources/WordNet-3.0/dict/index.sense'
         fd = open(wn_index_file,'r')
         for line in fd:
             #.22-caliber%3:01:00:: 03146310 1 0
             lexkey, synset, sense, freq = line.strip().split()
+            sense_info = SenseInfo()
+            sense_info.sense_number = sense
+            sense_info.lexkey = lexkey
+            sense_info.synset = synset
             self.synset_for_lexkey[lexkey] = synset
 
             p = lexkey.find('%')
             lemma = lexkey[:p]
             int_pos = lexkey[p+1]
-            self.synsets_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(synset) 
+            self.sense_info_list_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(sense_info) 
+
             
             parts = lexkey.split(':')
             int_supersense = parts[1]
