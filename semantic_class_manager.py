@@ -118,6 +118,19 @@ class SemanticClassManager(object):
         
     def get_type(self):
         return self.this_type
+    
+    def get_most_frequent_classes(self,lemma,pos):
+        classes = None
+        lexkey_for_first_sense = None
+        for sense_info in self.sense_info_iterator(lemma, pos):
+            if sense_info.sense_number == '1':
+                lexkey_for_first_sense = sense_info.lexkey
+                break
+        if lexkey_for_first_sense is not None:
+            classes = self.get_classes_for_lexkey(lexkey_for_first_sense)
+        return classes
+    
+    
             
         
     
