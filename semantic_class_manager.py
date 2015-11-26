@@ -34,12 +34,15 @@ class SemanticClassManager(object):
         self.VERB = 'v'
         self.ADJ = 'a'
         self.ADV = 'r'
+        self.resource = 'SemanticClassAbstract'
         self.wn_version = None
         self.wn_mapper = None   #By default we will not use it
         self.synset_for_lexkey = None   # To be read by the subclasses    {lexkey} --> offset        
         self.sense_info_list_for_lemma_pos = {}
-        self.this_type = 'SemanticClassAbstract'
         
+    def get_resource(self):
+        return self.resource
+    
     def normalise_pos(self,this_pos):
         pos = None
         if this_pos.lower() in ['noun','n','1']:
@@ -116,8 +119,6 @@ class SemanticClassManager(object):
     def are_compatible(self,class1,class2):
         pass
         
-    def get_type(self):
-        return self.this_type
     
     def get_most_frequent_classes(self,lemma,pos):
         classes = None
@@ -152,6 +153,7 @@ class BLC(SemanticClassManager):
         super(BLC, self).__init__()
         
         self.wn_version = '30'
+        self.resource = 'blc_%s_%d_wn%s' % (type_relations,min_freq,self.wn_version)
         
         # Checking the min frequency
         valid_min_freq = [0,10,20,50]
@@ -164,38 +166,29 @@ class BLC(SemanticClassManager):
         if type_relations.lower() not in valid_type_relations:
             print>>sys.stderr,'Type relation "%s" not valid. Valid relations: %s' % (type_relations,str(valid_type_relations))
             raise Exception('Type relation not valid')
-                                       
+                             
+        self.__read_index_sense__()          
         self.load_blc(min_freq, type_relations)   
-        self.this_type = 'BLC_minFreq#%d_relations#%s_wnversion#%s' % (min_freq, type_relations, self.wn_version)
         
           
              
     def load_blc(self,min_freq,type_relations):
-        friendly_blc_to_ili = self.__load_friendly_blc_from_ili__()                          
-        blc_file = __here__+'/resources/BLC_Wordnet-3.0/'
-        if min_freq == 0:
-            blc_file += "sinfreqmin"
-        else:
-            blc_file += 'freqmin%d' % min_freq
+        blc_folder = __here__ +'/resources/basic_level_concepts/BLC/WordNet-3.0/%s/%d' % (type_relations.lower(), min_freq)  
         
-        blc_file+='/'+type_relations.lower()
-        
-        for this_pos, this_file in [(self.NOUN,'BLCnoun.rel'),(self.VERB,'BLCverb.rel')]:
+        for this_pos, this_file in [(self.NOUN,'blc.noun'),(self.VERB,'blc.verb')]:
             self.map_synset_pos_to_class[this_pos] = {}
-            whole_path = blc_file+'/'+this_file
+            whole_path = blc_folder+'/'+this_file
             fd = open(whole_path,'r')
             for line in fd:
-                this_synset_pos, this_blc = line.strip().split()
-                this_synset = this_synset_pos[:-2]
-                final_blc, freq = friendly_blc_to_ili[this_blc]
-                self.map_synset_pos_to_class[this_pos][this_synset] = [final_blc]
+                #04958634 04916342 property.n#2 584
+                this_synset, synset_blc, friendly_blc, num_subsumed = line.strip().split()
+                self.map_synset_pos_to_class[this_pos][this_synset] = [friendly_blc]
         
         ###                                         
 
-    def __load_friendly_blc_from_ili__(self):
+    def __read_index_sense__(self):
         #ili_blc is like 02560585-v
 
-        friendly_blc_to_ili = {}
         path_to_wn_index = __here__+'/resources/WordNet-3.0/dict/index.sense'
         
         fd = open(path_to_wn_index,'r')
@@ -216,23 +209,8 @@ class BLC(SemanticClassManager):
             int_pos = lexkey[p+1]
             self.sense_info_list_for_lemma_pos[(lemma,self.normalise_pos(int_pos))].append(sense_info)
             
-            pos = None
-            if int_pos == '1':
-                pos = 'n'
-            elif int_pos == '2':
-                pos = 'v'
-            
-            if pos is not None:
-                ili = synset+'-'+pos
-                fr_blc = '%s.%s#%s' % (lexkey[:p],pos,sense)
-                if ili not in friendly_blc_to_ili:
-                    friendly_blc_to_ili[ili] = (fr_blc,freq)
-                else:
-                    _, prev_freq =  friendly_blc_to_ili[ili]
-                    if freq > prev_freq:
-                        friendly_blc_to_ili[ili] = (fr_blc,freq)
-        return friendly_blc_to_ili
-            
+
+
             
     def are_compatible(self,class1,class2):
         compatible = False
@@ -264,9 +242,9 @@ class WND(SemanticClassManager):
         super(WND, self).__init__()
         
         self.wn_version = '20'
+        self.resource = 'WND_wn%s' % self.wn_version
         self.__load_wnd__()
         self.__load_synset_for_lexkey__()
-        self.this_type = 'WND_wnversion#%s' % self.wn_version
         
     def __load_wnd__(self):
         #Creates
@@ -333,8 +311,8 @@ class SuperSense(SemanticClassManager):
         #Call constructor of the parent
         super(SuperSense, self).__init__()
         self.wn_version = '30'
+        self.resource = 'supersense_wn%s' % self.wn_version
         self.__load_info__()
-        self.this_type = 'SuperSenses_wnversion#%s' % self.wn_version
         
     def __load_info__(self):
         self.synset_for_lexkey = {}

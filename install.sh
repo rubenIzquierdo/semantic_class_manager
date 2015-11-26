@@ -14,16 +14,13 @@
 # Remove in case already exist (wndomains not removed)
 cd resources
 rm -rf WordNet-*
-rm -rf BLC_Wordnet-3.0
+rm -rf basic_level_concepts
 
 
 #########
-#BLC-wn30
+#BLC
 #########
-wget -O blc_wn30.tgz "http://adimen.si.ehu.es/web/modules/pubdlcnt/pubdlcnt.php?file=http://adimen.si.ehu.es/web/files/BLC/Wordnet-3.0.tar.gz&nid=12"
-tar xzf blc_wn30.tgz
-mv Wordnet-3.0/ BLC_Wordnet-3.0/
-rm blc_wn30.tgz
+git clone https://github.com/rubenIzquierdo/basic_level_concepts
 ########
 
 #############
