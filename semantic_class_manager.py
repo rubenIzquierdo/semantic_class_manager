@@ -181,8 +181,9 @@ class BLC(SemanticClassManager):
             fd = open(whole_path,'r')
             for line in fd:
                 #04958634 04916342 property.n#2 584
-                this_synset, synset_blc, friendly_blc, num_subsumed = line.strip().split()
-                self.map_synset_pos_to_class[this_pos][this_synset] = [friendly_blc]
+                if line[:3] != '###':
+                    this_synset, synset_blc, friendly_blc, num_subsumed = line.strip().split()
+                    self.map_synset_pos_to_class[this_pos][this_synset] = [friendly_blc]
         
         ###                                         
 
