@@ -237,15 +237,56 @@ class BLC(SemanticClassManager):
 ##########################################################################################
             
 class WND(SemanticClassManager):
-    def __init__(self):
+    def __init__(self, hierarchy=False):
         
         #Call constructor of the parent
         super(WND, self).__init__()
         
         self.wn_version = '20'
         self.resource = 'WND_wn%s' % self.wn_version
+        self.hierarchy=hierarchy
+        if self.hierarchy:
+            self.parent_for_label = {}
+            self.level_for_label = {}
+            self.__load_wnd_ontology()
+            
+            
         self.__load_wnd__()
         self.__load_synset_for_lexkey__()
+
+        
+    def __load_wnd_ontology(self):
+        previous_for_num_tab = {}
+        wnd_file_hierarchy = __here__ + '/resources/wn-domains-3.2/WND_hierarchy.txt'
+        fd = open(wnd_file_hierarchy)
+        for line in fd:
+            num_tabs = 0
+            while line[num_tabs] == '\t':
+                num_tabs += 1
+    
+            label = line.strip().lower()
+            previous_for_num_tab[num_tabs] = label
+            self.level_for_label[label] = num_tabs+1
+            if num_tabs == 0:
+                #is ROOT
+                pass
+            else:
+                parent = previous_for_num_tab[num_tabs-1]
+                self.parent_for_label[label] = parent
+        fd.close()
+        
+    def __get_domain_labels_for_hierarchy(self,label):
+        list_labels = []
+        this_level = self.level_for_label[label]
+        list_labels.append(label+'#%d' % this_level)
+        while True:
+            parent = self.parent_for_label.get(label,None)
+            if parent is None:
+                break
+            else:
+                list_labels.append(parent+'#%d' % self.level_for_label[parent])
+                label = parent
+        return list_labels
         
     def __load_wnd__(self):
         #Creates
@@ -263,6 +304,12 @@ class WND(SemanticClassManager):
             pos = synset_pos[-1]
             pos = self.normalise_pos(pos)
         
+            if self.hierarchy:
+                new_labels = []
+                for wnd_label in wnd_labels:
+                    new_labels.extend(self.__get_domain_labels_for_hierarchy(wnd_label))
+                wnd_labels = new_labels[:]
+                
             
             if pos not in self.map_synset_pos_to_class:
                 self.map_synset_pos_to_class[pos] = {}

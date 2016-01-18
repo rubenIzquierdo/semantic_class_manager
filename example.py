@@ -29,7 +29,7 @@ if __name__ == '__main__':
     
     wnd_obj = WND()
     print '#'*20
-    print 'WND'
+    print 'WND with no hierarchy'
     print 'wn20 00002287-a', wnd_obj.get_classes_for_synset_pos('00002287','a')
     print 'wn20 00012748-n', wnd_obj.get_classes_for_synset_pos('00012748', 'n')
     print 'wn21 00015024-n', wnd_obj.get_classes_for_synset_pos('00015024', 'n', '21')
@@ -38,6 +38,16 @@ if __name__ == '__main__':
     print 'Classes for house.n', wnd_obj.get_classes_for_lemma_pos('house', 'n')
     print 'Classes for guitar.n', wnd_obj.get_classes_for_lemma_pos('guitar', 'n')
     
+    wnd_obj = WND(hierarchy=True)
+    print '#'*20
+    print 'WND with hierarchy'
+    print 'wn20 00002287-a', wnd_obj.get_classes_for_synset_pos('00002287','a')
+    print 'wn20 00012748-n', wnd_obj.get_classes_for_synset_pos('00012748', 'n')
+    print 'wn21 00015024-n', wnd_obj.get_classes_for_synset_pos('00015024', 'n', '21')
+    print 'wn20 acoustic_guitar%1:06:00::', wnd_obj.get_classes_for_lexkey('acoustic_guitar%1:06:00::')
+    print 'wn16 acoustic_guitar%1:06:00::', wnd_obj.get_classes_for_lexkey('acoustic_guitar%1:06:00::','16')
+    print 'Classes for house.n', wnd_obj.get_classes_for_lemma_pos('house', 'n')
+    print 'Classes for guitar.n', wnd_obj.get_classes_for_lemma_pos('guitar', 'n')
     
     ss_obj = SuperSense()
     print '#'*20
