@@ -113,7 +113,13 @@ class SemanticClassManager(object):
             these_classes = self.get_classes_for_synset_pos(sense_info.synset, pos)
             if these_classes is not None:
                 classes.extend(these_classes)
-        return list(set(classes))
+        # In case we dont use the hierarchy option for WND, the list of classes will be
+        # a plain list of strings, with different classes for the different synsets. What
+        # we do here is remove the duplicated in these cases. Else, we return the whole object
+        if len(these_classes) != 0:
+            if not isinstance(these_classes[0],list):
+                classes = list(set(classes))
+        return classes
             
             
     def are_compatible(self,class1,class2):
@@ -307,7 +313,7 @@ class WND(SemanticClassManager):
             if self.hierarchy:
                 new_labels = []
                 for wnd_label in wnd_labels:
-                    new_labels.extend(self.__get_domain_labels_for_hierarchy(wnd_label))
+                    new_labels.append(self.__get_domain_labels_for_hierarchy(wnd_label))
                 wnd_labels = new_labels[:]
                 
             
