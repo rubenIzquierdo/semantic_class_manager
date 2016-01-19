@@ -284,13 +284,19 @@ class WND(SemanticClassManager):
     def __get_domain_labels_for_hierarchy(self,label):
         list_labels = []
         this_level = self.level_for_label[label]
-        list_labels.append(label+'#%d' % this_level)
+        #For the type music#3
+        #list_labels.append(label+'#%d' % this_level)
+        
+        #For using (music,3)
+        list_labels.append((label,this_level))
+            
         while True:
             parent = self.parent_for_label.get(label,None)
             if parent is None:
                 break
             else:
-                list_labels.append(parent+'#%d' % self.level_for_label[parent])
+                #list_labels.append(parent+'#%d' % self.level_for_label[parent])
+                list_labels.append((parent,self.level_for_label[parent]))
                 label = parent
         return list_labels
         
