@@ -64,7 +64,7 @@ The WND labels are organized in an ontology. By default in this API, the WDN lab
 leaves of the ontology. In some cases you might require to have the full ontology chain. You can do
 this easily by creating the WND object as `wnd_obj = WND(hierarchy=True)`. The methods are the same,
 with the difference that every class now is not a single string, but a list of strings (containing
-all the classes for the chain. These are two examples of what you could get witout and with the ontology
+all the classes for the chain. These are two examples of what you could get without and with the ontology
 option:
 ```sh
 #WND with no ontology option
@@ -78,7 +78,10 @@ Classes for acoustic_guitar%1:06:00:: [[('music', 3), ('art', 2), ('humanities',
 Classes for guitar.n [[('music', 3), ('art', 2), ('humanities', 1)]]
 ```
 
-#
+As you can see, every WND label now consists of two values: (WNDlabel, ontology_depth). The nodes
+at the top of the ontology have a depth of 1.
+
+
 ##Contact##
 - Ruben Izquierdo
 - Vrije University of Amsterdam
