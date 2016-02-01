@@ -116,8 +116,8 @@ class SemanticClassManager(object):
         # In case we dont use the hierarchy option for WND, the list of classes will be
         # a plain list of strings, with different classes for the different synsets. What
         # we do here is remove the duplicated in these cases. Else, we return the whole object
-        if len(these_classes) != 0:
-            if not isinstance(these_classes[0],list):
+        if len(classes) != 0:
+            if not isinstance(classes[0],list):
                 classes = list(set(classes))
         return classes
             
